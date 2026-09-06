@@ -1,0 +1,6 @@
+provider: SumUp
+api: Payouts
+kind: public_openapi_excerpt
+source: https://github.com/sumup/openapi/blob/main/openapi.yaml
+license: Apache-2.0
+excerpt_scope: list payouts endpoint and payout schema

@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: Vector Bank API
+  version: 1.0.0
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth: { type: apiKey, in: header, name: X-API-Key }
+paths:
+  /disbursements:
+    post:
+      operationId: createDisbursement
+      summary: Create disbursement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, merchant_reference, beneficiary]
+              properties:
+                amount: { type: integer, description: Amount in minor units }
+                merchant_reference: { type: string, description: Merchant reference }
+                beneficiary:
+                  type: object
+                  required: [iban, tax_id]
+                  properties:
+                    iban: { type: string }
+                    tax_id: { type: string }
+                    account_name: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disbursement_id: { type: string, description: Provider generated disbursement identifier }
+                  status: { type: string, enum: [new, settled, declined] }
+  /disbursements/{disbursement_id}:
+    get:
+      operationId: getDisbursementStatus
+      summary: Get disbursement status
+      parameters:
+        - name: disbursement_id
+          in: path
+          required: true
+          description: Provider generated disbursement identifier
+          schema: { type: string }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disbursement_id: { type: string, description: Provider generated disbursement identifier }
+                  status: { type: string, enum: [new, settled, declined] }
+  /webhooks/disbursement:
+    post:
+      operationId: disbursementWebhook
+      summary: Disbursement webhook notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event, status, disbursement_id]
+              properties:
+                event: { type: string, enum: [operation.processing, operation.completed, operation.failed] }
+                status: { type: string, enum: [new, settled, declined] }
+                disbursement_id: { type: string }
+                merchant_reference: { type: string }
+      responses:
+        '200': { description: Accepted }

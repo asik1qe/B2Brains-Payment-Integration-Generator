@@ -1,0 +1,23 @@
+fields:
+  operation.amount:
+    direction: request
+    provider_path: amount
+    transformation:
+      type: money
+      unit: kopecks
+      factor: 100
+
+webhook:
+  signature_encoding: hex
+  signed_payload: raw_body
+  secret_credential_path: webhook_secret
+
+conditions:
+  - provider_path: recipient.bank_code
+    required_if:
+      internal_path: operation.payout_requisite.sbp
+      present: true
+  - provider_path: recipient.card_number
+    required_if:
+      internal_path: operation.payout_requisite.card_number
+      present: true

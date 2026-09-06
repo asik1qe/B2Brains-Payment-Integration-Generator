@@ -1,0 +1,6 @@
+provider: Stripe
+api: Payouts
+kind: public_openapi_excerpt
+source: https://github.com/stripe/openapi/blob/master/openapi/spec3.yaml
+license: MIT
+excerpt_scope: create payout, retrieve payout, payout status and bearer authentication

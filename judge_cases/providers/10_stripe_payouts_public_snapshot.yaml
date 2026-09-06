@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  title: Stripe API - Payouts snapshot
+  version: '2026-08-27'
+servers:
+  - url: https://api.stripe.com
+paths:
+  /v1/payouts:
+    post:
+      operationId: PostPayouts
+      summary: Create a payout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [amount, currency]
+              properties:
+                amount:
+                  type: integer
+                currency:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payout'
+  /v1/payouts/{payout}:
+    get:
+      operationId: GetPayoutsPayout
+      summary: Retrieve a payout
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: payout
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payout'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    payout:
+      type: object
+      required: [id, amount, currency, status]
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [paid, pending, in_transit, canceled, failed]

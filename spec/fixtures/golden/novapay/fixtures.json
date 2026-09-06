@@ -1,0 +1,197 @@
+{
+  "create_request": {
+    "operation": {
+      "amount": 15000,
+      "id": "op_abc123",
+      "payout_requisite": {
+        "sbp": {
+          "phone": "79001234567",
+          "bank_code": "044525225",
+          "bank_name": "Сбербанк"
+        }
+      }
+    },
+    "provider_request": {
+      "amount": 1500000,
+      "external_id": "op_abc123",
+      "currency": "RUB",
+      "recipient": {
+        "phone": "79001234567",
+        "bank_code": "044525225",
+        "bank_name": "Сбербанк",
+        "type": "sbp"
+      }
+    },
+    "provider_response": {
+      "id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "pending",
+      "amount": 1500000,
+      "currency": "RUB",
+      "recipient": {
+        "type": "sbp",
+        "phone": "79001234567",
+        "bank_code": "044525225",
+        "bank_name": "Сбербанк",
+        "card_number": "4111111111111111"
+      },
+      "error": {
+        "code": "validation_error",
+        "message": "string"
+      },
+      "created_at": "2026-01-01T00:00:00Z",
+      "completed_at": "2026-01-01T00:00:00Z"
+    },
+    "variants": {
+      "sbp": {
+        "operation": {
+          "amount": 15000,
+          "id": "op_abc123",
+          "payout_requisite": {
+            "sbp": {
+              "phone": "79001234567",
+              "bank_code": "044525225",
+              "bank_name": "Сбербанк"
+            }
+          }
+        },
+        "provider_request": {
+          "amount": 1500000,
+          "external_id": "op_abc123",
+          "currency": "RUB",
+          "recipient": {
+            "phone": "79001234567",
+            "bank_code": "044525225",
+            "bank_name": "Сбербанк",
+            "type": "sbp"
+          }
+        }
+      },
+      "card": {
+        "operation": {
+          "amount": 15000,
+          "id": "op_abc123",
+          "payout_requisite": {
+            "card_number": "4111111111111111"
+          }
+        },
+        "provider_request": {
+          "amount": 1500000,
+          "external_id": "op_abc123",
+          "currency": "RUB",
+          "recipient": {
+            "card_number": "4111111111111111",
+            "type": "card"
+          }
+        }
+      }
+    }
+  },
+  "fetch_status": {
+    "provider_response": {
+      "id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "pending",
+      "amount": 1500000,
+      "currency": "RUB",
+      "recipient": {
+        "type": "sbp",
+        "phone": "79001234567",
+        "bank_code": "044525225",
+        "bank_name": "Сбербанк",
+        "card_number": "4111111111111111"
+      },
+      "error": {
+        "code": "validation_error",
+        "message": "string"
+      },
+      "created_at": "2026-01-01T00:00:00Z",
+      "completed_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  "callbacks": {
+    "in_progress": {
+      "event": "payout.processing",
+      "payout_id": "string",
+      "external_id": "string",
+      "status": "pending",
+      "completed_at": "2026-01-01T00:00:00Z",
+      "error": {
+        "code": "validation_error",
+        "message": "string"
+      }
+    },
+    "approved": {
+      "event": "payout.completed",
+      "payout_id": "string",
+      "external_id": "string",
+      "status": "completed",
+      "completed_at": "2026-01-01T00:00:00Z",
+      "error": {
+        "code": "validation_error",
+        "message": "string"
+      }
+    },
+    "rejected": {
+      "event": "payout.failed",
+      "payout_id": "string",
+      "external_id": "string",
+      "status": "failed",
+      "completed_at": "2026-01-01T00:00:00Z",
+      "error": {
+        "code": "validation_error",
+        "message": "string"
+      }
+    }
+  },
+  "errors": {
+    "bad_request": {
+      "http_status": 400,
+      "body": {
+        "error": {
+          "code": "validation_error",
+          "message": "string"
+        }
+      }
+    },
+    "unauthorized": {
+      "http_status": 401,
+      "body": {
+        "error": {
+          "code": "validation_error",
+          "message": "string"
+        }
+      }
+    },
+    "unprocessable_entity": {
+      "http_status": 402,
+      "body": {
+        "error": {
+          "code": "validation_error",
+          "message": "string"
+        }
+      }
+    },
+    "too_many_requests": {
+      "http_status": 429,
+      "body": {
+        "error": {
+          "code": "validation_error",
+          "message": "string"
+        }
+      },
+      "headers": {
+        "Retry-After": "60"
+      }
+    },
+    "internal_server_error": {
+      "http_status": 500,
+      "body": {
+        "error": {
+          "code": "validation_error",
+          "message": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.bundle/
+vendor/bundle/
+coverage/
+tmp/
+output/
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+.provider-compiler/

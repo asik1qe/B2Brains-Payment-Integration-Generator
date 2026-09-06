@@ -1,0 +1,16 @@
+fields:
+  operation.amount:
+    direction: request
+    provider_path: amount
+    transformation:
+      type: money
+      unit: minor_units
+      factor: 100
+  operation.payout_requisite.iban:
+    direction: request
+    provider_path: beneficiary.iban
+    required: true
+  operation.payout_requisite.tax_id:
+    direction: request
+    provider_path: beneficiary.tax_id
+    required: true

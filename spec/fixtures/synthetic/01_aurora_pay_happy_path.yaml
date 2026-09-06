@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: Aurora Pay API
+  version: 1.0.0
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+paths:
+  /payouts:
+    post:
+      operationId: createPayout
+      summary: Create payout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, external_id, recipient]
+              properties:
+                amount: { type: integer }
+                external_id: { type: string }
+                recipient:
+                  type: object
+                  required: [card_number]
+                  properties:
+                    card_number: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payout_id: { type: string }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /payouts/{payout_id}:
+    get:
+      operationId: getPayoutStatus
+      summary: Get payout status
+      parameters:
+        - name: payout_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payout_id: { type: string }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /webhooks/payout:
+    post:
+      operationId: payoutWebhook
+      summary: Payout webhook notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event, status, payout_id]
+              properties:
+                event: { type: string, enum: [payout.pending, payout.completed, payout.failed] }
+                status: { type: string, enum: [pending, completed, failed] }
+                payout_id: { type: string }
+                external_id: { type: string }
+      responses:
+        '200': { description: Accepted }

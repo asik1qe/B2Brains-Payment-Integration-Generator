@@ -1,0 +1,4 @@
+--color
+--format progress
+--require ./spec/support/suite_formatter
+--format ProviderCompiler::Spec::SuiteFormatter

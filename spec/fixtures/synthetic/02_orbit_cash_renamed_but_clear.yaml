@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: Orbit Cash API
+  version: 1.0.0
+security:
+  - PartnerToken: []
+components:
+  securitySchemes:
+    PartnerToken:
+      type: apiKey
+      in: header
+      name: X-Partner-Token
+paths:
+  /transfers:
+    post:
+      operationId: initiateTransfer
+      summary: Initiate transfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sum, reference_id, beneficiary]
+              properties:
+                sum: { type: integer }
+                reference_id: { type: string }
+                beneficiary:
+                  type: object
+                  required: [card]
+                  properties:
+                    card: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_id: { type: string }
+                  state: { type: string, enum: [queued, succeeded, declined] }
+  /transactions/{transaction_id}:
+    get:
+      operationId: retrieveTransaction
+      summary: Retrieve transaction status
+      parameters:
+        - name: transaction_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction_id: { type: string }
+                  state: { type: string, enum: [queued, succeeded, declined] }
+  /notifications:
+    post:
+      operationId: transactionNotification
+      summary: Transaction webhook notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event, state, transaction_id]
+              properties:
+                event: { type: string, enum: [transaction.queued, transaction.succeeded, transaction.declined] }
+                state: { type: string, enum: [queued, succeeded, declined] }
+                transaction_id: { type: string }
+                reference_id: { type: string }
+      responses:
+        '200': { description: Accepted }

@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Quartz Finance API
+  version: 1.0.0
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth: { type: apiKey, in: header, name: X-API-Key }
+  schemas:
+    PaymentRequest:
+      type: object
+      required: [amount, external_id, recipient]
+      properties:
+        amount: { type: integer, description: Amount in minor units }
+        external_id: { type: string }
+        recipient:
+          type: object
+          required: [card_number]
+          properties:
+            card_number: { type: string }
+paths:
+  /payments:
+    post:
+      operationId: createPayment
+      summary: Create payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PaymentRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_id: { type: string }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /payments/{payment_id}:
+    get:
+      operationId: getPaymentStatus
+      summary: Get payment status
+      parameters:
+        - { name: payment_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_id: { type: string }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /webhooks/payment:
+    post:
+      operationId: paymentWebhook
+      summary: Payment webhook notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event: { type: string, enum: [payment.pending, payment.completed, payment.failed] }
+                status: { type: string, enum: [pending, completed, failed] }
+                payment_id: { type: string }
+      responses:
+        '200': { description: Accepted }

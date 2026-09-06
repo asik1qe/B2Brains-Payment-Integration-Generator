@@ -1,0 +1,17 @@
+# General overrides example.
+# Do not put provider-specific hardcode into Mapper rules.
+#
+# Example shape only:
+#
+# operations:
+#   create_request:
+#     operation_id: createPayout
+#
+# fields:
+#   operation.amount:
+#     provider_path: amount
+#
+# transformations:
+#   operation.amount:
+#     type: money
+#     unit: kopecks

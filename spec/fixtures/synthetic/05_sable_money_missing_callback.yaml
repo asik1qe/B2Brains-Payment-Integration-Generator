@@ -1,0 +1,59 @@
+openapi: 3.0.3
+info:
+  title: Sable Money API
+  version: 1.0.0
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth: { type: apiKey, in: header, name: X-API-Key }
+paths:
+  /orders:
+    post:
+      operationId: createPayout
+      summary: Create payout order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, merchant_reference, recipient]
+              properties:
+                amount: { type: integer }
+                merchant_reference: { type: string, description: Merchant reference }
+                recipient:
+                  type: object
+                  required: [card_number]
+                  properties:
+                    card_number: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id: { type: string, description: Provider generated payout identifier }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /orders/{order_id}:
+    get:
+      operationId: getPayoutStatus
+      summary: Get payout order status
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          description: Provider generated payout identifier
+          schema: { type: string }
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id: { type: string, description: Provider generated payout identifier }
+                  status: { type: string, enum: [pending, completed, failed] }

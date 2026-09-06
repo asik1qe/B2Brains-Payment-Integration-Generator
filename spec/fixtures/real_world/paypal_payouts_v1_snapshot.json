@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Payouts",
+    "version": "1.9",
+    "description": "Snapshot of the public PayPal Payouts OpenAPI relevant to batch payout creation and status lookup."
+  },
+  "servers": [
+    {"url": "https://api-m.sandbox.paypal.com"},
+    {"url": "https://api-m.paypal.com"}
+  ],
+  "paths": {
+    "/v1/payments/payouts": {
+      "post": {
+        "operationId": "payouts.post",
+        "summary": "Create batch payout",
+        "parameters": [
+          {"name": "PayPal-Request-Id", "in": "header", "required": false, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/create_payout_request"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/payout"}}}
+          },
+          "400": {"description": "Bad request"},
+          "403": {"description": "Forbidden"},
+          "500": {"description": "Server error"}
+        },
+        "security": [{"Oauth2": ["https://uri.paypal.com/payments/payouts"]}]
+      }
+    },
+    "/v1/payments/payouts/{id}": {
+      "get": {
+        "operationId": "payouts.get",
+        "summary": "Show payout batch details",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/payout_batch"}}}
+          },
+          "404": {"description": "Not found"},
+          "500": {"description": "Server error"}
+        },
+        "security": [{"Oauth2": ["https://uri.paypal.com/payments/payouts"]}]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/v1/oauth2/token",
+            "scopes": {"https://uri.paypal.com/payments/payouts": "Payout to recipients"}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "create_payout_request": {
+        "type": "object",
+        "required": ["sender_batch_header", "items"],
+        "properties": {
+          "sender_batch_header": {"$ref": "#/components/schemas/sender_batch_header"},
+          "items": {"type": "array", "items": {"$ref": "#/components/schemas/payout_item_request"}}
+        }
+      },
+      "sender_batch_header": {
+        "type": "object",
+        "required": ["sender_batch_id"],
+        "properties": {"sender_batch_id": {"type": "string"}}
+      },
+      "payout_item_request": {
+        "type": "object",
+        "required": ["recipient_type", "amount", "receiver"],
+        "properties": {
+          "recipient_type": {"type": "string", "enum": ["EMAIL", "PHONE", "PAYPAL_ID"]},
+          "amount": {"$ref": "#/components/schemas/currency"},
+          "receiver": {"type": "string"}
+        }
+      },
+      "currency": {
+        "type": "object",
+        "required": ["currency", "value"],
+        "properties": {
+          "currency": {"type": "string"},
+          "value": {"type": "string"}
+        }
+      },
+      "payout": {
+        "type": "object",
+        "properties": {
+          "batch_header": {"$ref": "#/components/schemas/payout_batch"}
+        }
+      },
+      "payout_batch": {
+        "type": "object",
+        "properties": {
+          "payout_batch_id": {"type": "string"},
+          "batch_status": {
+            "type": "string",
+            "enum": ["DENIED", "PENDING", "PROCESSING", "SUCCESS", "CANCELED"]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+version: 1
+cases:
+  - id: novapay_official
+    label: NovaPay official input
+    spec: providers/01_novapay_official.yaml
+    provider: novapay_judge
+    expected_exit: 0
+    expected_status: SUCCESS
+    expected_artifacts: 3
+    expect_output:
+      - "OpenAPI       OK"
+      - "Mapping       OK"
+      - "Generation    OK"
+      - "Verification  OK"
+
+  - id: riverpay
+    label: RiverPay - Bearer, query status, nested response
+    spec: providers/02_riverpay_bearer_query_nested.yaml
+    provider: riverpay_judge
+    expected_exit: 0
+    expected_status: SUCCESS
+    expected_artifacts: 3
+
+  - id: atlasbank
+    label: AtlasBank - Basic auth and explicit unknown requisites
+    spec: providers/03_atlasbank_basic_review.yaml
+    provider: atlasbank_judge
+    overrides: overrides/atlasbank.yml
+    expected_exit: 0
+    expected_status: SUCCESS
+    expected_artifacts: 3
+
+  - id: pulsemoney
+    label: PulseMoney - query API key and webhook metadata
+    spec: providers/04_pulsemoney_query_apikey.yaml
+    provider: pulsemoney_judge
+    expected_exit: 0
+    expected_status: SUCCESS
+    expected_artifacts: 3
+
+  - id: meridian
+    label: Meridian - deeply nested request, response and callback
+    spec: providers/05_meridian_nested_objects.yaml
+    provider: meridian_judge
+    expected_exit: 0
+    expected_status: SUCCESS
+    expected_artifacts: 3
+
+  - id: northstar
+    label: Northstar - missing callback must fail safely
+    spec: providers/06_northstar_missing_callback.yaml
+    provider: northstar_judge
+    expected_exit: 1
+    expected_status: FAILED
+    expected_artifacts: 0
+    expect_output:
+      - "Required callback operation was not found"
+
+  - id: polaris
+    label: Polaris - ambiguous create operation must require review
+    spec: providers/07_polaris_ambiguous_operations.yaml
+    provider: polaris_judge
+    expected_exit: 3
+    expected_status: NEEDS REVIEW
+    expected_artifacts: 0
+    expect_output:
+      - "critical_operation_mapping_needs_review"
+
+  - id: malformed_yaml
+    label: Malformed OpenAPI must fail cleanly
+    spec: providers/08_broken_yaml.yaml
+    provider: malformed_judge
+    expected_exit: 1
+    expected_status: FAILED
+    expected_artifacts: 0
+    expect_output:
+      - "openapi_parse_error"
+
+  - id: paypal_public
+    label: PayPal Payouts public-source OpenAPI excerpt
+    spec: providers/09_paypal_payouts_public_snapshot.json
+    provider: paypal_public_judge
+    expected_exit: 1
+    expected_status: FAILED
+    expected_artifacts: 0
+    expect_output:
+      - "Required callback operation was not found"
+
+  - id: stripe_public
+    label: Stripe Payouts public-source OpenAPI excerpt
+    spec: providers/10_stripe_payouts_public_snapshot.yaml
+    provider: stripe_public_judge
+    expected_exit: 1
+    expected_status: FAILED
+    expected_artifacts: 0
+    expect_output:
+      - "Required callback operation was not found"
+
+  - id: sumup_public
+    label: SumUp Payouts public-source OpenAPI excerpt
+    spec: providers/11_sumup_payouts_public_snapshot.yaml
+    provider: sumup_public_judge
+    expected_exit: 1
+    expected_status: FAILED
+    expected_artifacts: 0
+    expect_output:
+      - "Required callback operation was not found"

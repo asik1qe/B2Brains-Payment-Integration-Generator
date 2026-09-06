@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: RiverPay Transfer API
+  version: 1.0.0
+servers:
+- url: https://api.riverpay.example/v2
+paths:
+  /transfers:
+    post:
+      operationId: initiateTransfer
+      summary: Create payout transfer
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEnvelope'
+        '401':
+          description: Unauthorized
+        '422':
+          description: Validation error
+        '500':
+          description: Provider error
+  /operations:
+    get:
+      operationId: getTransferState
+      summary: Get payout status
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: transaction_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Provider-generated transaction identifier.
+      responses:
+        '200':
+          description: Current state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEnvelope'
+        '404':
+          description: Not found
+  /events/payout:
+    post:
+      operationId: payoutEvent
+      summary: Payout callback notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferEvent'
+      responses:
+        '200':
+          description: Accepted
+  /balance:
+    get:
+      operationId: getBalance
+      summary: Read account balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                - type: array
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    TransferRequest:
+      type: object
+      required:
+      - amount
+      - client_reference
+      - beneficiary
+      properties:
+        amount:
+          type: number
+          minimum: 1
+          description: Amount in major currency units.
+        client_reference:
+          type: string
+          description: Client external payout reference.
+        beneficiary:
+          type: object
+          required:
+          - card_number
+          properties:
+            card_number:
+              type: string
+              description: Recipient card number.
+    TransferEnvelope:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: object
+          required:
+          - transaction_id
+          - state
+          properties:
+            transaction_id:
+              type: string
+              description: Provider-generated transaction identifier.
+            state:
+              type: string
+              enum:
+              - created
+              - processing
+              - done
+              - declined
+            reason:
+              type: string
+    TransferEvent:
+      type: object
+      required:
+      - type
+      - transaction_id
+      - state
+      properties:
+        type:
+          type: string
+          enum:
+          - payout.created
+          - payout.processing
+          - payout.done
+          - payout.declined
+        transaction_id:
+          type: string
+        client_reference:
+          type: string
+        state:
+          type: string
+          enum:
+          - created
+          - processing
+          - done
+          - declined
+        reason:
+          type: string

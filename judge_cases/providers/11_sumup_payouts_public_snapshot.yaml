@@ -1,0 +1,59 @@
+openapi: 3.0.3
+info:
+  title: SumUp API - Payouts snapshot
+  version: '1.0'
+servers:
+  - url: https://api.sumup.com
+paths:
+  /v1.0/merchants/{merchant_code}/payouts:
+    get:
+      operationId: ListPayoutsV1
+      summary: List payouts
+      parameters:
+        - name: merchant_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Returns payouts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payout'
+      security:
+        - apiKey: []
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    Payout:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESSFUL, FAILED, PENDING]

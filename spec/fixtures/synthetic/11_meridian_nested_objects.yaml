@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Meridian Payments API
+  version: 1.0.0
+servers:
+- url: https://api.meridian.example/api
+paths:
+  /payments/outgoing:
+    post:
+      operationId: openOutgoingPayment
+      summary: Create outgoing payout
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnvelope'
+      responses:
+        '200':
+          description: Opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentEnvelope'
+  /payments/outgoing/status:
+    get:
+      operationId: readOutgoingPayment
+      summary: Get outgoing payout status
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: payment_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Provider payment identifier.
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentEnvelope'
+  /notifications/payment:
+    post:
+      operationId: paymentNotification
+      summary: Payout state notification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentNotification'
+      responses:
+        '200':
+          description: Accepted
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Meridian-Key
+  schemas:
+    CreateEnvelope:
+      type: object
+      required:
+      - payment
+      properties:
+        payment:
+          type: object
+          required:
+          - amount
+          - reference
+          - recipient
+          properties:
+            amount:
+              type: number
+              minimum: 1
+              description: Payout amount in major units.
+            reference:
+              type: string
+              description: Client external reference.
+            recipient:
+              type: object
+              required:
+              - card_number
+              properties:
+                card_number:
+                  type: string
+    PaymentEnvelope:
+      type: object
+      required:
+      - result
+      properties:
+        result:
+          type: object
+          required:
+          - payment_id
+          - status
+          properties:
+            payment_id:
+              type: string
+              description: Provider-generated payment id.
+            status:
+              type: string
+              enum:
+              - new
+              - processing
+              - paid
+              - failed
+            failure_reason:
+              type: string
+    PaymentNotification:
+      type: object
+      required:
+      - event
+      - payment
+      properties:
+        event:
+          type: string
+          enum:
+          - payment.new
+          - payment.processing
+          - payment.paid
+          - payment.failed
+        payment:
+          type: object
+          required:
+          - payment_id
+          - status
+          properties:
+            payment_id:
+              type: string
+            reference:
+              type: string
+            status:
+              type: string
+              enum:
+              - new
+              - processing
+              - paid
+              - failed
+            failure_reason:
+              type: string

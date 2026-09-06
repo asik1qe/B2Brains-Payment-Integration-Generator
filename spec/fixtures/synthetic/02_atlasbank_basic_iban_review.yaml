@@ -1,0 +1,146 @@
+openapi: 3.0.3
+info:
+  title: AtlasBank Disbursement API
+  version: 1.0.0
+servers:
+- url: https://api.atlasbank.example
+paths:
+  /disbursements:
+    post:
+      operationId: createDisbursement
+      summary: Create bank payout
+      security:
+      - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisbursementRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisbursementResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '422':
+          description: Validation error
+  /disbursements/status:
+    get:
+      operationId: readDisbursementStatus
+      summary: Read payout status
+      security:
+      - BasicAuth: []
+      parameters:
+      - name: disbursement_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Provider disbursement identifier.
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisbursementResponse'
+  /callbacks/disbursement:
+    post:
+      operationId: disbursementCallback
+      summary: Disbursement callback
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisbursementCallback'
+      responses:
+        '200':
+          description: Accepted
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    DisbursementRequest:
+      type: object
+      required:
+      - amount
+      - merchant_reference
+      - beneficiary
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+          description: Amount in minor units.
+        merchant_reference:
+          type: string
+          description: Merchant payout reference.
+        beneficiary:
+          type: object
+          required:
+          - iban
+          - tax_id
+          properties:
+            iban:
+              type: string
+              description: Beneficiary IBAN.
+            tax_id:
+              type: string
+              description: Beneficiary tax identifier.
+            account_name:
+              type: string
+              description: Optional beneficiary account name.
+    DisbursementResponse:
+      type: object
+      required:
+      - disbursement_id
+      - status
+      properties:
+        disbursement_id:
+          type: string
+          description: Provider-generated disbursement id.
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - settled
+          - rejected
+        message:
+          type: string
+    DisbursementCallback:
+      type: object
+      required:
+      - event
+      - disbursement_id
+      - status
+      properties:
+        event:
+          type: string
+          enum:
+          - disbursement.queued
+          - disbursement.processing
+          - disbursement.settled
+          - disbursement.rejected
+        disbursement_id:
+          type: string
+        merchant_reference:
+          type: string
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - settled
+          - rejected
+        message:
+          type: string

@@ -1,0 +1,146 @@
+openapi: 3.0.3
+info:
+  title: PulseMoney Payout API
+  version: 1.0.0
+servers:
+- url: https://api.pulsemoney.example/v1
+paths:
+  /withdrawals:
+    post:
+      operationId: submitWithdrawal
+      summary: Create payout withdrawal
+      security:
+      - QueryKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawalRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+        '429':
+          description: Rate limit
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+  /withdrawals/{withdrawal_id}:
+    get:
+      operationId: fetchWithdrawal
+      summary: Fetch withdrawal status
+      security:
+      - QueryKey: []
+      parameters:
+      - name: withdrawal_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+  /webhooks/withdrawals:
+    post:
+      operationId: withdrawalWebhook
+      summary: Withdrawal webhook
+      description: Signature is sent in X-Pulse-Signature using HMAC-SHA512.
+      security: []
+      parameters:
+      - name: X-Pulse-Signature
+        in: header
+        required: true
+        schema:
+          type: string
+        description: HMAC-SHA512 signature.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawalEvent'
+      responses:
+        '200':
+          description: Accepted
+components:
+  securitySchemes:
+    QueryKey:
+      type: apiKey
+      in: query
+      name: api_key
+  schemas:
+    WithdrawalRequest:
+      type: object
+      required:
+      - amount
+      - external_id
+      - recipient
+      properties:
+        amount:
+          type: number
+          minimum: 1
+          description: Amount in major currency units.
+        external_id:
+          type: string
+          description: External payout identifier.
+        recipient:
+          type: object
+          required:
+          - card_number
+          properties:
+            card_number:
+              type: string
+    WithdrawalResponse:
+      type: object
+      required:
+      - withdrawal_id
+      - status
+      properties:
+        withdrawal_id:
+          type: string
+          description: Provider withdrawal identifier.
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - settled
+          - declined
+        error_message:
+          type: string
+    WithdrawalEvent:
+      type: object
+      required:
+      - event
+      - withdrawal_id
+      - status
+      properties:
+        event:
+          type: string
+          enum:
+          - withdrawal.queued
+          - withdrawal.processing
+          - withdrawal.settled
+          - withdrawal.declined
+        withdrawal_id:
+          type: string
+        external_id:
+          type: string
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - settled
+          - declined
+        error_message:
+          type: string

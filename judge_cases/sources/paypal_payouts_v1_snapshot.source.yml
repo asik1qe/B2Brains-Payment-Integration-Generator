@@ -1,0 +1,7 @@
+provider: PayPal
+api: Payouts v1
+kind: public_openapi_excerpt
+source: https://github.com/paypal/paypal-rest-api-specifications/blob/main/openapi/payments_payouts_batch_v1.json
+license: Apache-2.0
+openapi: 3.0.3
+excerpt_scope: create batch payout, get payout batch status, relevant local schemas and OAuth2 scheme

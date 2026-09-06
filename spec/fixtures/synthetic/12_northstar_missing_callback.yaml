@@ -1,0 +1,77 @@
+openapi: 3.0.3
+info:
+  title: Northstar Payout API
+  version: 1.0.0
+servers:
+- url: https://api.northstar.example/v1
+paths:
+  /payout-orders:
+    post:
+      operationId: createPayoutOrder
+      summary: Create payout order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutOrderRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutOrderResponse'
+  /payout-orders/{order_id}:
+    get:
+      operationId: getPayoutOrder
+      summary: Get payout status
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutOrderResponse'
+components:
+  schemas:
+    PayoutOrderRequest:
+      type: object
+      required:
+      - amount
+      - merchant_reference
+      - recipient
+      properties:
+        amount:
+          type: number
+          description: Amount in major units.
+        merchant_reference:
+          type: string
+        recipient:
+          type: object
+          required:
+          - card_number
+          properties:
+            card_number:
+              type: string
+    PayoutOrderResponse:
+      type: object
+      required:
+      - order_id
+      - status
+      properties:
+        order_id:
+          type: string
+          description: Provider payout order identifier.
+        status:
+          type: string
+          enum:
+          - pending
+          - completed
+          - failed

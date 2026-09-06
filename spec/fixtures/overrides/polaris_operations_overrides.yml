@@ -1,0 +1,4 @@
+operations:
+  create_request:
+    method: POST
+    path: /payments

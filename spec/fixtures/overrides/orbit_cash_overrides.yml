@@ -1,0 +1,5 @@
+fields:
+  operation.payout_requisite.card_number:
+    direction: request
+    provider_path: beneficiary.card
+    required: true
