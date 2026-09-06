@@ -568,51 +568,7 @@ bundle exec rspec
 
 Эти проверки покрывают unit-логику, полный compiler pipeline, generated runtime, CLI, универсальность на разных структурах и безопасное поведение на неполных или неоднозначных входных данных.
 
-## 14. Рекомендуемый порядок демонстрации жюри
-
-Если нужно показать продукт за несколько минут:
-
-### Шаг 1. Все автоматические тесты
-
-```powershell
-bundle exec rspec
-```
-
-Показать итоговый `RESULT: PASS` и разбивку по категориям.
-
-### Шаг 2. Основной успешный pipeline
-
-```powershell
-bundle exec ruby bin/integrate --spec .\judge_cases\providers\01_novapay_official.yaml --provider novapay_demo --output .\tmp\demo\novapay --force
-```
-
-Показать пять стадий, `Status: SUCCESS` и три результата в output.
-
-### Шаг 3. Интерактивное разрешение неоднозначности
-
-```powershell
-bundle exec ruby bin/integrate --spec .\judge_cases\providers\07_polaris_ambiguous_operations.yaml --provider polaris_live_demo --output .\tmp\demo\polaris
-```
-
-Показать, что Compiler не угадывает критичный endpoint, а предлагает выбор и сохраняет решение.
-
-### Шаг 4. Безопасный отказ
-
-```powershell
-bundle exec ruby bin/integrate --spec .\judge_cases\providers\06_northstar_missing_callback.yaml --provider northstar_demo --output .\tmp\demo\northstar
-```
-
-Показать, что при отсутствии обязательной операции generation не запускается.
-
-### Шаг 5. Общая матрица провайдеров
-
-```powershell
-.\judge_cases\run_all.ps1
-```
-
-Показать итог по всем подготовленным сценариям.
-
-## 15. Дополнительная документация
+## 14. Дополнительная документация
 
 Документация по классам и модулям находится в папке:
 
